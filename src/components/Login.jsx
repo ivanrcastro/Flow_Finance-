@@ -1,7 +1,39 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useTranslation } from 'react-i18next';
+
+// Componente Interno para o Seletor de Línguas
+const LanguageSelector = () => {
+  const { i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
+  return (
+    <div className="flex gap-4 p-2 bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl shadow-sm">
+      <button
+        onClick={() => changeLanguage('pt')}
+        className={`transition-all duration-300 hover:scale-110 active:scale-95 ${
+          i18n.language === 'pt' ? 'ring-2 ring-blue-500 ring-offset-2 rounded-full' : 'opacity-50 hover:opacity-100'
+        }`}
+      >
+        <img src="/pt.png" alt="Português" className="w-8 h-8 rounded-full object-cover shadow-sm" />
+      </button>
+      <button
+        onClick={() => changeLanguage('en')}
+        className={`transition-all duration-300 hover:scale-110 active:scale-95 ${
+          i18n.language === 'en' ? 'ring-2 ring-blue-500 ring-offset-2 rounded-full' : 'opacity-50 hover:opacity-100'
+        }`}
+      >
+        <img src="/en.png" alt="English" className="w-8 h-8 rounded-full object-cover shadow-sm" />
+      </button>
+    </div>
+  );
+};
 
 export const Login = () => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,7 +64,12 @@ export const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F2F2F7] relative overflow-hidden font-sans">
       
-      {/* BACKGROUND GLOWS (TONS CLAROS) */}
+      {/* SELETOR DE LÍNGUA NO CANTO SUPERIOR DIREITO */}
+      <div className="absolute top-8 right-8 z-50">
+        <LanguageSelector />
+      </div>
+
+      {/* BACKGROUND GLOWS */}
       <div className="absolute w-[600px] h-[600px] bg-blue-200/50 blur-[120px] rounded-full -top-40 -left-40 animate-pulse"></div>
       <div className="absolute w-[500px] h-[500px] bg-indigo-100/60 blur-[120px] rounded-full bottom-0 right-0"></div>
 
@@ -51,10 +88,10 @@ export const Login = () => {
         {/* TITLE */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-extrabold text-black tracking-tight">
-            {isSignUp ? "Join Flow" : "Welcome back"}
+            {isSignUp ? t('auth.signUp') : t('auth.signIn')}
           </h1>
           <p className="text-gray-500 text-sm mt-2 font-medium">
-            Manage your finances beautifully
+            {t('app.tagline')}
           </p>
         </div>
 
@@ -62,7 +99,7 @@ export const Login = () => {
           {/* USERNAME */}
           <input
             type="text"
-            placeholder="Username"
+            placeholder={t('auth.placeholderUser')}
             value={username}
             onChange={(e)=>setUsername(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl bg-gray-50/50 border border-gray-100 text-black placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
@@ -71,7 +108,7 @@ export const Login = () => {
           {/* PASSWORD */}
           <input
             type="password"
-            placeholder="Password"
+            placeholder={t('auth.placeholderPass')}
             value={password}
             onChange={(e)=>setPassword(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl bg-gray-50/50 border border-gray-100 text-black placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
@@ -82,26 +119,27 @@ export const Login = () => {
             disabled={loading}
             className="w-full mt-2 py-4 rounded-2xl bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 active:scale-[0.98] transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50"
           >
-            {loading ? "Loading..." : "Continue"}
+            {loading ? t('actions.loading') : t('auth.continue')}
           </button>
         </form>
 
         {/* SWITCH */}
         <div className="text-center mt-8">
           <button
+            type="button"
             onClick={()=>setIsSignUp(!isSignUp)}
             className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
           >
-            {isSignUp ? "Already have an account? Sign in" : "Create a new Flow account"}
+            {isSignUp ? t('auth.switchSignIn') : t('auth.switchSignUp')}
           </button>
         </div>
 
       </div>
 
-      {/* FOOTER DISCRETO */}
+      {/* FOOTER */}
       <footer className="absolute bottom-8 w-full text-center">
         <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">
-          Flow Finance
+          {t('app.name')}
         </p>
       </footer>
     </div>

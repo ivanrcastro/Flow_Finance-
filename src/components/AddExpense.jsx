@@ -1,40 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
+// Mantemos o ID fixo para o Banco de Dados, mas o Label será traduzido
 const CATEGORIES = [
-  { id: 'Bills', label: 'Bills', icon: '📄' },
-  { id: 'Subscriptions', label: 'Subscriptions', icon: '🔄' },
-  { id: 'Entertainment', label: 'Entertainment', icon: '🎬' },
-  { id: 'Food & Drink', label: 'Food & Drink', icon: '🍴' },
-  { id: 'Groceries', label: 'Groceries', icon: '🛒' },
-  { id: 'Health & Wellbeing', label: 'Health & Wellbeing', icon: '💊' },
-  { id: 'Shopping', label: 'Shopping', icon: '🛍️' },
-  { id: 'Transport', label: 'Transport', icon: '🚗' },
-  { id: 'Travel', label: 'Travel', icon: '✈️' },
-  { id: 'Business', label: 'Business', icon: '💼' },
-  { id: 'Gifts', label: 'Gifts', icon: '🎁' },
-  { id: 'Other', label: 'Other', icon: '🌀' }
+  { id: 'Bills', icon: '📄' },
+  { id: 'Subscriptions', icon: '🔄' },
+  { id: 'Entertainment', icon: '🎬' },
+  { id: 'Food & Drink', icon: '🍴' },
+  { id: 'Groceries', icon: '🛒' },
+  { id: 'Health & Wellbeing', icon: '💊' },
+  { id: 'Shopping', icon: '🛍️' },
+  { id: 'Transport', icon: '🚗' },
+  { id: 'Travel', icon: '✈️' },
+  { id: 'Business', icon: '💼' },
+  { id: 'Gifts', icon: '🎁' },
+  { id: 'Other', icon: '🌀' }
 ];
 
 export const AddExpense = ({ onAddExpense, onClose }) => {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
+
+  // BLOQUEAR SCROLL DA HOME
+  useEffect(() => {
+    // Quando monta: remove o scroll do body
+    document.body.style.overflow = 'hidden';
+    
+    // Quando desmonta (fecha): devolve o scroll
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
     if (!amount || !category) {
-      return alert("Por favor, preenche o valor e escolhe uma categoria!");
+      return alert(t('actions.fillAll') || "Please fill all fields!");
     }
 
-    // Criar o objeto da despesa
     const newExpense = {
       amount: parseFloat(amount),
       category: category,
     };
 
     onAddExpense(newExpense);
-    
-    // Limpar o formulário
     setAmount('');
     setCategory('');
   };
@@ -51,7 +62,7 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
 
       <div className="mb-6">
         <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 text-center">
-          Registar Gasto
+          {t('nav.addExpense')}
         </h3>
       </div>
       
@@ -65,7 +76,7 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full pl-12 pr-6 py-5 bg-slate-50 rounded-2xl text-3xl font-black outline-none border-2 border-transparent focus:border-primary focus:bg-white transition-all text-slate-800"
+            className="w-full pl-12 pr-6 py-5 bg-slate-50 rounded-2xl text-3xl font-black outline-none border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all text-slate-800"
             autoFocus
           />
         </div>
@@ -79,13 +90,14 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
               onClick={() => setCategory(cat.id)}
               className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all duration-300 ${
                 category === cat.id 
-                  ? 'border-primary bg-primary/5 text-primary scale-95 shadow-inner font-bold' 
+                  ? 'border-blue-500 bg-blue-50 text-blue-600 scale-95 shadow-inner font-bold' 
                   : 'border-slate-50 bg-slate-50 text-slate-400 hover:border-slate-200'
               }`}
             >
               <span className="text-xl mb-1">{cat.icon}</span>
               <span className="text-[8px] font-black uppercase tracking-tighter truncate w-full text-center">
-                {cat.label}
+                {/* Tradução dinâmica baseada no ID da categoria */}
+                {t(`categories.${cat.id}`)}
               </span>
             </button>
           ))}
@@ -94,9 +106,9 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
         {/* Botão de Confirmação */}
         <button 
           type="submit" 
-          className="w-full bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20 active:scale-95 transition-all hover:bg-primary/90"
+          className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20 active:scale-95 transition-all hover:bg-blue-700"
         >
-          Confirmar Gasto
+          {t('actions.save')}
         </button>
       </form>
     </div>

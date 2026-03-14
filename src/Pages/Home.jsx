@@ -4,8 +4,10 @@ import { Navbar } from "../components/Navbar";
 import { AddExpense } from "../components/AddExpense";
 import BudgetChart from "../components/BudgetChart";
 import { Login } from "../components/Login";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   return (
     <footer className="py-8 text-center flex flex-col items-center gap-1 mt-4">
@@ -14,13 +16,14 @@ const Footer = () => {
         Flow <span className="font-light">Finance</span>
       </p>
       <p className="text-[9px] font-semibold text-gray-400/40 uppercase tracking-tighter">
-        © {currentYear} • Designed for Privacy
+        © {currentYear} • {t('app.footer')}
       </p>
     </footer>
   );
 };
 
 export const Home = () => {
+  const { t, i18n } = useTranslation();
   const [session, setSession] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -36,21 +39,24 @@ export const Home = () => {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
 
-  // 1. GESTÃO DE SESSÃO
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSession(session));
     return () => subscription.unsubscribe();
   }, []);
 
-  // 2. FETCH DE DADOS
   useEffect(() => {
     if (session) fetchExpenses();
   }, [session]);
 
-  // Lógica do nome movida para DENTRO do componente
   const username = session?.user?.email?.split('@')[0];
   const displayName = username ? username.charAt(0).toUpperCase() + username.slice(1) : "User";
+
+  // Função para trocar de idioma
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'pt' ? 'en' : 'pt';
+    i18n.changeLanguage(newLang);
+  };
 
   async function fetchExpenses() {
     const { data, error } = await supabase.from('expenses').select('*').order('created_at', { ascending: false });
@@ -89,13 +95,12 @@ export const Home = () => {
   };
 
   const handleDeleteExpense = async (id) => {
-    const confirm = window.confirm("Delete this expense?");
+    const confirm = window.confirm(t('actions.cancel') + "?"); 
     if (!confirm) return;
     const { error } = await supabase.from('expenses').delete().eq('id', id);
     if (!error) setExpenses(prev => prev.filter(exp => exp.id !== id));
   };
 
-  // 3. PROTEÇÃO DE ROTA
   if (!session) return <Login />;
 
   const currentMonthData = expenses.filter(exp => exp.created_at.startsWith(selectedMonth));
@@ -112,18 +117,17 @@ export const Home = () => {
       <header className="px-6 pt-12 pb-4">
         <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              {/* AVATAR COM INICIAL */}
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100">
                   <span className="text-blue-600 font-bold text-sm">{displayName.charAt(0)}</span>
               </div>
               
               <div>
                   <h1 className="text-2xl font-extrabold tracking-tight text-black leading-none">
-                    {displayName}
+                    {t('dashboard.welcome')} {displayName}
                   </h1>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em]">
-                        Monthly Overview
+                        {t('dashboard.mtd')}
                     </p>
                     {session.user.email === ADMIN_EMAIL && (
                         <span className="text-[8px] bg-blue-500/10 text-blue-600 px-1.5 py-0.5 rounded-md font-black uppercase tracking-wider">Admin</span>
@@ -132,21 +136,33 @@ export const Home = () => {
               </div>
             </div>
 
-            <button 
-              onClick={() => supabase.auth.signOut()} 
-              className="bg-gray-200/50 hover:bg-gray-200 px-3 py-1.5 rounded-full text-[11px] font-bold text-gray-500 transition-all active:scale-95 uppercase tracking-wider"
-            >
-              Sign Out
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Botão de Troca de Idioma */}
+              <button 
+                onClick={toggleLanguage}
+                className="w-7 h-7 rounded-full overflow-hidden border border-white shadow-sm hover:scale-110 active:scale-95 transition-all"
+              >
+                <img 
+                  src={i18n.language === 'pt' ? "/en.png" : "/pt.png"} 
+                  alt="Language Toggle" 
+                  className="w-full h-full object-cover"
+                />
+              </button>
+
+              <button 
+                onClick={() => supabase.auth.signOut()} 
+                className="bg-gray-200/50 hover:bg-gray-200 px-3 py-1.5 rounded-full text-[11px] font-bold text-gray-500 transition-all active:scale-95 uppercase tracking-wider"
+              >
+                {t('nav.logout')}
+              </button>
+            </div>
         </div>
       </header>
 
       <main className="max-w-md mx-auto p-5 space-y-6 flex-grow w-full">
-        {/* ... Resto do teu componente (Spending Limit, Month Select, Activity, etc) ... */}
-        
         <section className="bg-white p-8 rounded-[32px] shadow-[0_2px_15px_rgba(0,0,0,0.02)] flex flex-col items-center justify-center animate-fade-in group text-center">
           <label className="text-[9px] font-bold uppercase text-blue-500 tracking-[0.2em] mb-2 opacity-60">
-            Spending Limit
+            {t('dashboard.budget')}
           </label>
           <div className="relative flex flex-col items-center">
             <div className="flex items-baseline justify-center">
@@ -167,7 +183,7 @@ export const Home = () => {
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </button>
           <span className="text-[13px] font-bold capitalize tracking-tight text-gray-700">
-            {new Date(selectedMonth + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            {new Date(selectedMonth + "-01").toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })}
           </span>
           <button onClick={() => handleMonthChange(1)} className="p-2.5 text-blue-600 active:scale-75 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -191,9 +207,9 @@ export const Home = () => {
               currentMonthData.map((exp, idx) => (
                 <div key={exp.id} className={`p-4 flex justify-between items-center active:bg-gray-50 transition-colors ${idx !== 0 ? 'border-t border-gray-50' : ''}`}>
                   <div className="flex flex-col">
-                    <span className="font-bold text-[14px] text-gray-800 tracking-tight">{exp.category}</span>
+                    <span className="font-bold text-[14px] text-gray-800 tracking-tight">{t(`categories.${exp.category}`)}</span>
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
-                      {new Date(exp.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(exp.created_at).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
                   <div className="flex items-center gap-4">

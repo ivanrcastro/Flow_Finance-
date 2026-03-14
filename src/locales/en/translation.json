@@ -1,168 +1,55 @@
 {
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "projects": "Projects",
-    "contact": "Contact"
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "addExpense": "Add Expense",
+    "logout": "Sign Out"
   },
-  "home": {
-    "greetingPrefix": "Hi, I'm",
-    "firstName": "Ivan",
-    "lastName": "Castro",
-    "intro": "I am a Robotics and Automation Engineer passionate about creating innovative solutions. Skilled in PLCs, robotics programming, and software development. I enjoy solving challenges and making technology smarter.\nMy goal is to keep growing as an engineer and contribute to impactful projects.",
-    "scroll": "Scroll"
+  "app": {
+    "name": "Flow Finance",
+    "tagline": "Manage your finances beautifully",
+    "footer": "Flow Finance • 2026 • Designed for Clarity"
   },
-  "about": {
-    "aboutLine": "About",
-    "meLine": "me",
-    "academic": "Academic background",
-    "contact": "Get in touch",
-    "cv": "View my CV",
-    "experience": "Experience",
-    "experiences": [
-    {
-      "date": "2023–2024",
-      "role": "Student Researcher in Robotics",
-      "company": "University of Minho",
-      "description": "Research and development in mobile robotics • Control algorithms development • Master's degree research"
-    },
-    {
-      "date": "2024–2025",
-      "role": "Software and Robotics Engineer",
-      "company": "Bosch Car Multimedia",
-      "description": "Programming collaborative robots (Universal Robots) • Robotic system development with ROS2 and C++ • Innovation projects for manufacturing line supply"
-    },
-    {
-      "date": "2025–Current",
-      "role": "Software and Automation Engineer",
-      "company": "Preh Portugal",
-      "description": "Software integration (C#/.NET) • Beckhoff TwinCAT 3 PLC programming • Sensopart vision system integration • SQL Server database management • MQTT communication & Mosquitto Broker for PLC-HMI integration"
-    }
-  ]
+  "dashboard": {
+    "welcome": "Welcome back,",
+    "balance": "Monthly Balance",
+    "budget": "Budget Limit",
+    "spent": "Total Spent",
+    "mtd": "Month to Date",
+    "categories": "Spending by Category",
+    "total_spent": "Total Spent",
+    "vs_last_month": "vs Last Month (MTD)",
+    "saved": "Saved",
+    "budget_progress": "Budget Progress",
+    "exceeded": "Exceeded by",
+    "left": "left"
   },
-  "academic": {
-    "bachelor": "Bachelor’s in Industrial Electronics and Computers Engineering",
-    "university": "University of Minho",
-    "bYear": "2019–2022",
-    "master": "Master’s in Control, Automation and Robotics",
-    "mYear": "2022–2024"
+  "auth": {
+    "signIn": "Welcome back",
+    "signUp": "Create your Flow account",
+    "placeholderUser": "Username",
+    "placeholderPass": "Password",
+    "continue": "Continue",
+    "switchSignUp": "New to Flow? Create an account",
+    "switchSignIn": "Already have an account? Sign in"
   },
-  "skills": {
-    "skillsList": [
-      { "name": "Beckhoff TwinCAT 3", "level": "85", "category": "automation" },
-      { "name": "PLC Programming", "level": "85", "category": "automation" },
-      { "name": "Sensorpart Vision", "level": "80", "category": "automation" },
-      { "name": "C# / .NET", "level": "85", "category": "software" },
-      { "name": "SQL Server", "level": "75", "category": "software" },
-      { "name": "ROS2", "level": "90", "category": "automation" },
-      { "name": "Universal Robots", "level": "75", "category": "automation" },
-      { "name": "C / C++", "level": "75", "category": "software" },
-      { "name": "Python", "level": "25", "category": "software" },
-      { "name": "React / Next.js", "level": "20", "category": "frontend" },
-      { "name": "JavaScript / TypeScript", "level": "25", "category": "frontend" },
-      { "name": "Tailwind CSS", "level": "20", "category": "frontend" },
-      { "name": "HTML/CSS", "level": "50", "category": "frontend" },
-      { "name": "Git / GitLab", "level": "85", "category": "tools" },
-      { "name": "Technical Documentation", "level": "85", "category": "tools" },
-      { "name": "Agile / Scrum", "level": "85", "category": "tools" }
-    ],
-    "categories": [
-      { "key": "all", "label": "All" },
-      { "key": "automation", "label": "Automation" },
-      { "key": "software", "label": "Software" },
-      { "key": "frontend", "label": "Frontend" },
-      { "key": "tools", "label": "Tools" }
-    ],
-    "title": "My",
-    "title2": "Skills"
+  "actions": {
+    "save": "Save Transaction",
+    "cancel": "Cancel",
+    "loading": "Processing..."
   },
-  "projects": {
-    "title": "Projects",
-    "categories": [
-      { "key": "all", "label": "All" },
-      { "key": "academic", "label": "Academic Projects" },
-      { "key": "professional", "label": "Professional Work" },
-      { "key": "personal", "label": "Personal" }
-    ],
-    "subtitle": "Each project represents countless hours of problem-solving and that magical moment when the robot finally does what it was supposed to do.",
-    "ctaGithub": "Check my GitHub",
-    "openDemo": "Open demo",
-    "openGithub": "Open GitHub repository",
-    "items": [
-      {
-        "id": 1,
-        "title": "Assembly Machines Programming",
-        "category": "professional",
-        "description": "Automation and control logic development for complex assembly machines, including PLC programming and HMI integration.",
-        "image": "/projects/assembly.png",
-        "tags": ["TwinCAT 3", "C#", "Sensopart Vision Integration", "Industrial Automation", "Function Blocks"],
-        "demoUrl": "",
-        "githubUrl": ""
-      },
-      {
-        "id": 2,
-        "title": "Climate Screening Software",
-        "category": "professional",
-        "description": "Development of automated screening software for climate chamber testing, featuring data acquisition systems and real-time process monitoring.",
-        "image": "/projects/climate_test.png",
-        "tags": ["C#", "Data Acquisition", "LIN Protocol", "Software Development", "Automation"],
-        "demoUrl": "",
-        "githubUrl": ""
-      },
-      {
-        "id": 3,
-        "title": "Depalletizer Solution",
-        "category": "professional",
-        "description": "Implementation of a depalletizing solution using a Universal Robots UR10 collaborative robot to optimize production line supply.",
-        "image": "/projects/depalletizer.png",
-        "tags": ["Universal Robots", "ROS2", "Robotics", "Industry 4.0"],
-        "demoUrl": "",
-        "githubUrl": ""
-      },
-      {
-        "id": 4,
-        "title": "Master’s Thesis - Navigation Control",
-        "category": "academic",
-        "description": "Development of navigation control and docking maneuvers for autonomous mobile manipulators (KUKA KMR iiwa) in logistics environments.",
-        "image": "/projects/thesis.png",
-        "tags": ["ROS2", "C++", "KUKA", "AMR", "Autonomous Systems", "Logistics solutions"],
-        "demoUrl": "",
-        "githubUrl": ""
-      },
-      {
-        "id": 5,
-        "title": "Autonomous Underwater Glider",
-        "category": "academic",
-        "description": "Development of an autonomous underwater glider designed for short-range data collection and environmental monitoring.",
-        "image": "/projects/glider.png",
-        "tags": ["C++", "GPS", "DC Motor", "Robotics"],
-        "demoUrl": "",
-        "githubUrl": "https://github.com/ivanrcastro"
-      },
-      {
-        "id": 6,
-        "title": "First Portfolio",
-        "category": "personal",
-        "description": "Initial web development project focused on fundamental concepts of responsive design and UI/UX basics using core web technologies.",
-        "image": "/projects/firstPortfolio.png",
-        "tags": ["HTML", "CSS", "JavaScript"],
-        "demoUrl": "",
-        "githubUrl": "https://github.com/ivanrcastro/Website_Portfolio"
-      }
-    ]
-  },
-  "contact": {
-    "title": "Get in",
-    "title2": "Touch",
-    "subtitle": "Interested in industrial automation or software engineering? Let's connect.",
-    "info": "Contact Information",
-    "email": "ivanrcastro6@gmail.com",
-    "location": "Localização",
-    "city": "Porto, Portugal",
-    "connect": "Connect with me",
-    "sendButton": "EXECUTE_MESSAGE_SEND"
-  },
-  "footer": {
-    "rights": "All rights reserved."
+  "categories": {
+    "Bills": "Bills",
+    "Subscriptions": "Subscriptions",
+    "Entertainment": "Entertainment",
+    "Food & Drink": "Food & Drink",
+    "Groceries": "Groceries",
+    "Health & Wellbeing": "Health",
+    "Shopping": "Shopping",
+    "Transport": "Transport",
+    "Travel": "Travel",
+    "Business": "Business",
+    "Gifts": "Gifts",
+    "Other": "Other"
   }
 }
