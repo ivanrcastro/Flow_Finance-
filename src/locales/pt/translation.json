@@ -8,14 +8,14 @@
   "app": {
     "name": "Flow Finance",
     "tagline": "Gere as tuas finanças com elegância",
-    "footer": "Flow Finance • 2026 • Desenhado para Clareza"
+    "footer": "Flow Finance • Desenhado para Clareza"
   },
   "dashboard": {
-    "welcome": "Bem-vindo de volta,",
+    "welcome": "",
     "balance": "Balanço Mensal",
-    "budget": "Limite de Orçamento",
+    "budget": "Limite ",
     "spent": "Total Gasto",
-    "mtd": "Acumulado do Mês",
+    "mtd": "Total de despesas do Mês",
     "categories": "Gastos por Categoria",
     "total_spent": "Total Gasto",
     "vs_last_month": "vs Mês Passado",
@@ -25,7 +25,7 @@
     "left": "restantes"
   },
   "auth": {
-    "signIn": "Bem-vindo de volta",
+    "signIn": "Bem-vindo",
     "signUp": "Cria a tua conta Flow",
     "placeholderUser": "Utilizador",
     "placeholderPass": "Palavra-passe",
