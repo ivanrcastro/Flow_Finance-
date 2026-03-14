@@ -1,7 +1,7 @@
 # 🌊 Flow Finance
 **A minimal, professional, and private personal finance manager.**
 
-Inspired by Apple's 2026 design language, **Flow Finance** is a React-based web application designed to give you a seamless overview of your monthly spending without the clutter of traditional banking apps.
+**Flow Finance** is a React-based web application designed to give you a seamless overview of your monthly spending without the clutter of traditional banking apps.
 
 ---
 
