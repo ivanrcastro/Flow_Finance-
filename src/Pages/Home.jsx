@@ -27,12 +27,13 @@ export const Home = () => {
   const [session, setSession] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [monthlyBudget, setMonthlyBudget] = useState(0); // Inicia a 0 enquanto carrega
   
   const ADMIN_EMAIL = 'your-email@example.com'; 
 
-  const [monthlyBudget, setMonthlyBudget] = useState(() => {
-    return Number(localStorage.getItem('monthlyBudget')) || 1300;
-  });
+  // const [monthlyBudget, setMonthlyBudget] = useState(() => {
+  //   return Number(localStorage.getItem('monthlyBudget')) || 1300;
+  // });
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
@@ -47,7 +48,8 @@ export const Home = () => {
 
   useEffect(() => {
     if (session) fetchExpenses();
-  }, [session]);
+    fetchMonthlyBudget();
+  }, [session, selectedMonth]);
 
   const username = session?.user?.email?.split('@')[0];
   const displayName = username ? username.charAt(0).toUpperCase() + username.slice(1) : "User";
@@ -63,10 +65,41 @@ export const Home = () => {
     if (!error) setExpenses(data);
   }
 
-  const handleBudgetChange = (e) => {
+  // Vai buscar o orçamento específico do mês/ano à tabela 'budgets'
+  async function fetchMonthlyBudget() {
+    const [year, month] = selectedMonth.split('-').map(Number);
+    
+    const { data, error } = await supabase
+      .from('budgets')
+      .select('amount')
+      .eq('month', month)
+      .eq('year', year)
+      .maybeSingle(); // Retorna null se não houver, sem dar erro no console
+
+    if (!error && data) {
+      setMonthlyBudget(data.amount);
+    } else {
+      // Valor padrão caso não exista registo para o mês (ex: 1000)
+      setMonthlyBudget(1000); 
+    }
+  }
+
+  const handleBudgetChange = async (e) => {
     const value = Number(e.target.value);
     setMonthlyBudget(value);
-    localStorage.setItem('monthlyBudget', value);
+    
+    const [year, month] = selectedMonth.split('-').map(Number);
+
+    const { error } = await supabase
+      .from('budgets')
+      .upsert({ 
+        user_id: session.user.id,
+        month: month,
+        year: year,
+        amount: value
+      }, { onConflict: 'user_id, month, year' });
+
+    if (error) console.error("Erro ao guardar orçamento:", error.message);
   };
 
   const handleMonthChange = (offset) => {
