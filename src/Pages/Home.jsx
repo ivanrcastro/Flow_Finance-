@@ -27,37 +27,51 @@ export const Home = () => {
   const [session, setSession] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [monthlyBudget, setMonthlyBudget] = useState(0); // Inicia a 0 enquanto carrega
+  const [monthlyBudget, setMonthlyBudget] = useState(0);
   
   const ADMIN_EMAIL = 'your-email@example.com'; 
-
-  // const [monthlyBudget, setMonthlyBudget] = useState(() => {
-  //   return Number(localStorage.getItem('monthlyBudget')) || 1300;
-  // });
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
 
+  // Listener de Autenticação
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSession(session));
     return () => subscription.unsubscribe();
   }, []);
 
+  // Carregar dados sempre que a sessão ou o mês mudar
   useEffect(() => {
-    if (session) fetchExpenses();
-    fetchMonthlyBudget();
+    if (session) {
+      fetchExpenses();
+      fetchMonthlyBudget();
+    }
   }, [session, selectedMonth]);
 
   const username = session?.user?.email?.split('@')[0];
   const displayName = username ? username.charAt(0).toUpperCase() + username.slice(1) : "User";
 
-  // Função para trocar de idioma
   const toggleLanguage = () => {
     const newLang = i18n.language === 'pt' ? 'en' : 'pt';
     i18n.changeLanguage(newLang);
+  };
+
+  // CORREÇÃO DO LOGOUT (Evita o Erro 403 Forbidden)
+  const handleLogout = async () => {
+    try {
+      // Tentamos o logout oficial no Supabase
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Logout error:", error.message);
+    } finally {
+      // Limpamos TUDO localmente para garantir que volta ao Login
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.reload(); 
+    }
   };
 
   async function fetchExpenses() {
@@ -65,8 +79,8 @@ export const Home = () => {
     if (!error) setExpenses(data);
   }
 
-  // Vai buscar o orçamento específico do mês/ano à tabela 'budgets'
   async function fetchMonthlyBudget() {
+    if (!session?.user?.id) return;
     const [year, month] = selectedMonth.split('-').map(Number);
     
     const { data, error } = await supabase
@@ -74,13 +88,12 @@ export const Home = () => {
       .select('amount')
       .eq('month', month)
       .eq('year', year)
-      .maybeSingle(); // Retorna null se não houver, sem dar erro no console
+      .maybeSingle();
 
     if (!error && data) {
       setMonthlyBudget(data.amount);
     } else {
-      // Valor padrão caso não exista registo para o mês (ex: 1000)
-      setMonthlyBudget(1000); 
+      setMonthlyBudget(1000); // Valor base caso não exista registo
     }
   }
 
@@ -128,8 +141,8 @@ export const Home = () => {
   };
 
   const handleDeleteExpense = async (id) => {
-    const confirm = window.confirm(t('actions.cancel') + "?"); 
-    if (!confirm) return;
+    const confirmDelete = window.confirm(t('actions.cancel') + "?"); 
+    if (!confirmDelete) return;
     const { error } = await supabase.from('expenses').delete().eq('id', id);
     if (!error) setExpenses(prev => prev.filter(exp => exp.id !== id));
   };
@@ -170,7 +183,6 @@ export const Home = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Botão de Troca de Idioma */}
               <button 
                 onClick={toggleLanguage}
                 className="w-7 h-7 rounded-full overflow-hidden border border-white shadow-sm hover:scale-110 active:scale-95 transition-all"
@@ -183,7 +195,7 @@ export const Home = () => {
               </button>
 
               <button 
-                onClick={() => supabase.auth.signOut()} 
+                onClick={handleLogout} 
                 className="bg-gray-200/50 hover:bg-gray-200 px-3 py-1.5 rounded-full text-[11px] font-bold text-gray-500 transition-all active:scale-95 uppercase tracking-wider"
               >
                 {t('nav.logout')}
