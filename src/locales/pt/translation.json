@@ -1,0 +1,168 @@
+{
+  "nav": {
+    "home": "Início",
+    "about": "Sobre",
+    "projects": "Projetos",
+    "contact": "Contacto"
+  },
+  "home": {
+    "greetingPrefix": "Olá, eu sou o",
+    "firstName": "Ivan",
+    "lastName": "Castro",
+    "intro": "Sou um Engenheiro de Robótica e Automação apaixonado por criar soluções inovadoras. Especialista em programação de PLCs, robótica e desenvolvimento de software. Gosto de resolver desafios e tornar a tecnologia mais inteligente.\nO meu objetivo é continuar a crescer como engenheiro e contribuir para projetos de alto impacto.",
+    "scroll": "Scroll"
+  },
+  "about": {
+    "aboutLine": "Sobre",
+    "meLine": "mim",
+    "academic": "Percurso Académico",
+    "contact": "Entrar em contacto",
+    "cv": "Ver o meu CV",
+    "experience": "Experiência",
+    "experiences": [
+      {
+        "date": "2023–2024",
+        "role": "Investigador de Robótica (Estudante)",
+        "company": "Universidade do Minho",
+        "description": "Investigação e desenvolvimento em robótica móvel • Desenvolvimento de algoritmos de controlo • Investigação no âmbito do Mestrado"
+      },
+      {
+        "date": "2024–2025",
+        "role": "Engenheiro de Software e Robótica",
+        "company": "Bosch Car Multimedia",
+        "description": "Programação de robôs colaborativos (Universal Robots) • Desenvolvimento de sistemas robóticos com ROS2 e C++ • Projetos de inovação para sistemas de abastecimento de linhas de produção"
+      },
+      {
+        "date": "2025–Presente",
+        "role": "Engenheiro de Software e Automação",
+        "company": "Preh Portugal",
+        "description": "Integração de software (C#/.NET) • Programação de PLCs Beckhoff TwinCAT 3 • Integração de sistemas de visão Sensopart • Gestão de bases de dados SQL Server • Comunicação MQTT e Mosquitto Broker para integração PLC-HMI • Controlo de versões via GitLab"
+      }
+    ]
+  },
+  "academic": {
+    "bachelor": "Licenciatura em Engenharia de Eletrónica Industrial e Computadores",
+    "university": "Universidade do Minho",
+    "bYear": "2019–2022",
+    "master": "Mestrado em Engenharia de Controlo, Automação e Robótica",
+    "mYear": "2022–2024"
+  },
+  "skills": {
+    "skillsList": [
+      { "name": "Beckhoff TwinCAT 3", "level": "85", "category": "automation" },
+      { "name": "Programação de PLC", "level": "85", "category": "automation" },
+      { "name": "Visão Sensopart", "level": "80", "category": "automation" },
+      { "name": "C# / .NET", "level": "85", "category": "software" },
+      { "name": "SQL Server", "level": "75", "category": "software" },
+      { "name": "ROS2", "level": "90", "category": "automation" },
+      { "name": "Universal Robots", "level": "75", "category": "automation" },
+      { "name": "C / C++", "level": "75", "category": "software" },
+      { "name": "Python", "level": "25", "category": "software" },
+      { "name": "React / Next.js", "level": "20", "category": "frontend" },
+      { "name": "JavaScript / TypeScript", "level": "25", "category": "frontend" },
+      { "name": "Tailwind CSS", "level": "20", "category": "frontend" },
+      { "name": "HTML/CSS", "level": "50", "category": "frontend" },
+      { "name": "Git / GitLab", "level": "85", "category": "tools" },
+      { "name": "Documentação Técnica", "level": "85", "category": "tools" },
+      { "name": "Agile / Scrum", "level": "85", "category": "tools" }
+    ],
+    "categories": [
+      { "key": "all", "label": "Tudo" },
+      { "key": "automation", "label": "Automação" },
+      { "key": "software", "label": "Software" },
+      { "key": "frontend", "label": "Frontend" },
+      { "key": "tools", "label": "Ferramentas" }
+    ],
+    "title": "As minhas",
+    "title2": "Skills"
+  },
+  "projects": {
+    "title": "Projetos",
+    "categories": [
+      { "key": "all", "label": "Tudo" },
+      { "key": "academic", "label": "Projetos Académicos" },
+      { "key": "professional", "label": "Trabalho Profissional" },
+      { "key": "personal", "label": "Pessoal" }
+    ],
+    "subtitle": "Cada projeto representa inúmeras horas de resolução de problemas e aquele momento mágico em que o robô finalmente faz o que era suposto fazer.",
+    "ctaGithub": "Ver o meu GitHub",
+    "openDemo": "Abrir demo",
+    "openGithub": "Abrir repositório GitHub",
+    "items": [
+      {
+        "id": 1,
+        "title": "Programação de Máquinas de Montagem",
+        "category": "professional",
+        "description": "Desenvolvimento de lógica de automação e controlo para máquinas de montagem complexas, incluindo programação de PLC e integração de HMI.",
+        "image": "/projects/assembly.png",
+        "tags": ["TwinCAT 3", "C#", "Integração Visão Sensopart", "Automação Industrial", "Function Blocks"],
+        "demoUrl": "",
+        "githubUrl": ""
+      },
+      {
+        "id": 2,
+        "title": "Software de Climate Screening",
+        "category": "professional",
+        "description": "Desenvolvimento de software de triagem automatizado para testes em câmaras climáticas, com sistemas de aquisição de dados e monitorização em tempo real.",
+        "image": "/projects/climate_test.png",
+        "tags": ["C#", "Aquisição de Dados", "Protocolo LIN", "Desenvolvimento de Software", "Automação"],
+        "demoUrl": "",
+        "githubUrl": ""
+      },
+      {
+        "id": 3,
+        "title": "Solução de Despaletização",
+        "category": "professional",
+        "description": "Implementação de uma solução de despaletização utilizando um robô colaborativo Universal Robots UR10 para otimizar o abastecimento da linha de produção.",
+        "image": "/projects/depalletizer.png",
+        "tags": ["Universal Robots", "ROS2", "Robótica", "Indústria 4.0"],
+        "demoUrl": "",
+        "githubUrl": ""
+      },
+      {
+        "id": 4,
+        "title": "Tese de Mestrado - Controlo de Navegação",
+        "category": "academic",
+        "description": "Desenvolvimento de controlo de navegação e manobras de docking para manipuladores móveis autónomos (KUKA KMR iiwa) em ambientes logísticos.",
+        "image": "/projects/thesis.png",
+        "tags": ["ROS2", "C++", "KUKA", "AMR", "Sistemas Autónomos", "Soluções Logísticas"],
+        "demoUrl": "",
+        "githubUrl": ""
+      },
+      {
+        "id": 5,
+        "title": "Underwater Glider Autónomo",
+        "category": "academic",
+        "description": "Desenvolvimento de um glider subaquático autónomo projetado para recolha de dados de curto alcance e monitorização ambiental.",
+        "image": "/projects/glider.png",
+        "tags": ["C++", "GPS", "Motores DC", "Robótica"],
+        "demoUrl": "",
+        "githubUrl": "https://github.com/ivanrcastro"
+      },
+      {
+        "id": 6,
+        "title": "Primeiro Portfólio",
+        "category": "personal",
+        "description": "Projeto inicial de desenvolvimento web focado em conceitos fundamentais de design responsivo e bases de UI/UX utilizando tecnologias web base.",
+        "image": "/projects/firstPortfolio.png",
+        "tags": ["HTML", "CSS", "JavaScript"],
+        "demoUrl": "",
+        "githubUrl": "https://github.com/ivanrcastro/Website_Portfolio"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Entrar em",
+    "title2": "Contacto",
+    "subtitle": "Interessado em automação industrial ou engenharia de software? Vamos conversar.",
+    "info": "Informação de Contacto",
+    "email": "ivanrcastro6@gmail.com",
+    "location": "Localização",
+    "city": "Porto, Portugal",
+    "connect": "Conecta-te comigo",
+    "sendButton": "EXECUTAR_ENVIO_MENSAGEM"
+  },
+  "footer": {
+    "rights": "Todos os direitos reservados."
+  }
+}
