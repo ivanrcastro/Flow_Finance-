@@ -5,10 +5,7 @@ import { useTranslation } from 'react-i18next';
 // Componente Interno para o Seletor de Línguas
 const LanguageSelector = () => {
   const { i18n } = useTranslation();
-
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
-  };
+  const changeLanguage = (lng) => i18n.changeLanguage(lng);
 
   return (
     <div className="flex gap-4 p-2 bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl shadow-sm">
@@ -46,32 +43,28 @@ export const Login = () => {
     
     const email = `${username.trim().toLowerCase()}@tracker.com`;
 
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) alert(error.message);
-      else {
-        alert("Account created!");
-        setIsSignUp(false);
-        setPassword('');
-      }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) alert("Invalid credentials");
-    }
-    setLoading(false);
-  };
-
-  // NOVA FUNÇÃO: Login com FaceID/Passkey
-  const handlePasskeyLogin = async () => {
-    setLoading(true);
     try {
-      // Nota: Para isto funcionar, tens de ativar o WebAuthn no Dashboard do Supabase
-      const { error } = await supabase.auth.signInWithPasskey();
-      if (error) throw error;
+      if (isSignUp) {
+        // 1. Criar a conta
+        const { error: signUpError } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: { data: { display_name: username } }
+        });
+        
+        if (signUpError) throw signUpError;
+
+        // 2. Login Automático (Crucial para o browser pedir para guardar password)
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) throw signInError;
+
+      } else {
+        // Login normal
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw new Error("Invalid credentials");
+      }
     } catch (error) {
-      console.error("Erro FaceID:", error.message);
-      // Se der erro porque não está configurado, avisamos o user
-      alert(t('auth.passkeyError') || "FaceID not configured for this device yet.");
+      alert(error.message);
     } finally {
       setLoading(false);
     }
@@ -80,16 +73,24 @@ export const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F2F2F7] relative overflow-hidden font-sans">
       
-      {/* SELETOR DE LÍNGUA */}
       <div className="absolute top-8 right-8 z-50">
         <LanguageSelector />
       </div>
 
-      {/* BACKGROUND GLOWS ... (código original) */}
+      {/* BACKGROUND GLOWS */}
+      <div className="absolute w-[600px] h-[600px] bg-blue-200/50 blur-[120px] rounded-full -top-40 -left-40 animate-pulse"></div>
+      <div className="absolute w-[500px] h-[500px] bg-indigo-100/60 blur-[120px] rounded-full bottom-0 right-0"></div>
 
       <div className="relative w-full max-w-[400px] mx-4 backdrop-blur-2xl bg-white/70 border border-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[32px] p-10">
         
-        {/* LOGO FLOW ... (código original) */}
+        {/* LOGO */}
+        <div className="flex justify-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+        </div>
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-extrabold text-black tracking-tight">
@@ -103,8 +104,8 @@ export const Login = () => {
         <form onSubmit={handleAuth} className="space-y-4">
           <input
             type="text"
-            name="username" // Adicionado para Auto-fill
-            autoComplete="username" // Adicionado para Auto-fill
+            name="username"
+            autoComplete="username" 
             placeholder={t('auth.placeholderUser')}
             value={username}
             onChange={(e)=>setUsername(e.target.value)}
@@ -113,8 +114,8 @@ export const Login = () => {
 
           <input
             type="password"
-            name="password" // Adicionado para Auto-fill
-            autoComplete={isSignUp ? "new-password" : "current-password"} // Adicionado para Auto-fill
+            name="password"
+            autoComplete={isSignUp ? "new-password" : "current-password"}
             placeholder={t('auth.placeholderPass')}
             value={password}
             onChange={(e)=>setPassword(e.target.value)}
@@ -129,19 +130,6 @@ export const Login = () => {
           </button>
         </form>
 
-        {/* BOTÃO FACEID (Só aparece no Login) */}
-        {!isSignUp && (
-          <div className="mt-4">
-            <button
-              onClick={handlePasskeyLogin}
-              type="button"
-              className="w-full py-4 rounded-2xl bg-white border border-gray-200 text-gray-700 font-bold text-sm flex items-center justify-center gap-2 hover:bg-gray-50 active:scale-[0.98] transition-all"
-            >
-              <span className="text-xl">👤</span> {t('auth.signInWithFaceID') || 'Sign in with FaceID'}
-            </button>
-          </div>
-        )}
-
         <div className="text-center mt-8">
           <button
             type="button"
@@ -153,7 +141,11 @@ export const Login = () => {
         </div>
       </div>
 
-      {/* FOOTER ... (código original) */}
+      <footer className="absolute bottom-8 w-full text-center">
+        <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">
+          {t('app.name')}
+        </p>
+      </footer>
     </div>
   );
 };
