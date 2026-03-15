@@ -27,7 +27,7 @@ export const Home = () => {
   const [session, setSession] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [monthlyBudget, setMonthlyBudget] = useState(0);
+  const [monthlyBudget, setMonthlyBudget] = useState(""); // Mantido como string para suporte a vírgula
   
   const ADMIN_EMAIL = 'your-email@example.com'; 
 
@@ -36,14 +36,12 @@ export const Home = () => {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
 
-  // Listener de Autenticação
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSession(session));
     return () => subscription.unsubscribe();
   }, []);
 
-  // Carregar dados sempre que a sessão ou o mês mudar
   useEffect(() => {
     if (session) {
       fetchExpenses();
@@ -59,15 +57,12 @@ export const Home = () => {
     i18n.changeLanguage(newLang);
   };
 
-  // CORREÇÃO DO LOGOUT (Evita o Erro 403 Forbidden)
   const handleLogout = async () => {
     try {
-      // Tentamos o logout oficial no Supabase
       await supabase.auth.signOut();
     } catch (error) {
       console.error("Logout error:", error.message);
     } finally {
-      // Limpamos TUDO localmente para garantir que volta ao Login
       localStorage.clear();
       sessionStorage.clear();
       window.location.reload(); 
@@ -91,41 +86,37 @@ export const Home = () => {
       .maybeSingle();
 
     if (!error && data) {
-      setMonthlyBudget(data.amount);
+      setMonthlyBudget(data.amount.toString().replace('.', ','));
     } else {
-      setMonthlyBudget(1000); // Valor base caso não exista registo
+      setMonthlyBudget("1000");
     }
   }
 
   const handleBudgetChange = async (e) => {
-  // 1. Pegamos no valor tal como o utilizador digitou (com vírgula ou ponto)
-  let rawValue = e.target.value;
-  
-  // 2. Permitimos que o utilizador apague tudo ou escreva (apenas números e uma vírgula/ponto)
-  if (rawValue === "" || /^[0-9]*[.,]?[0-9]*$/.test(rawValue)) {
-    setMonthlyBudget(rawValue); // Atualiza o ecrã com o que ele digitou (ex: "1200,5")
+    let rawValue = e.target.value;
+    
+    // Aceita apenas números e um separador (ponto ou vírgula)
+    if (rawValue === "" || /^[0-9]*[.,]?[0-9]*$/.test(rawValue)) {
+      setMonthlyBudget(rawValue);
 
-    // 3. Só tentamos guardar no Supabase se houver números
-    const normalizedValue = rawValue.replace(',', '.');
-    const numericValue = parseFloat(normalizedValue);
+      const normalizedValue = rawValue.replace(',', '.');
+      const numericValue = parseFloat(normalizedValue);
 
-    if (!isNaN(numericValue) && session?.user?.id) {
-      const [year, month] = selectedMonth.split('-').map(Number);
-      
-      // Debounce ou Delay seria ideal aqui, mas vamos fazer o upsert direto
-      const { error } = await supabase
-        .from('budgets')
-        .upsert({ 
-          user_id: session.user.id,
-          month: month,
-          year: year,
-          amount: numericValue
-        }, { onConflict: 'user_id, month, year' });
+      if (!isNaN(numericValue) && session?.user?.id) {
+        const [year, month] = selectedMonth.split('-').map(Number);
+        const { error } = await supabase
+          .from('budgets')
+          .upsert({ 
+            user_id: session.user.id,
+            month: month,
+            year: year,
+            amount: numericValue
+          }, { onConflict: 'user_id, month, year' });
 
-      if (error) console.error("Erro no Supabase:", error.message);
+        if (error) console.error("Erro no Supabase:", error.message);
+      }
     }
-  }
-};
+  };
 
   const handleMonthChange = (offset) => {
     const [year, month] = selectedMonth.split('-').map(Number);
@@ -167,7 +158,10 @@ export const Home = () => {
   const prevMonthStr = `${prevDateObj.getFullYear()}-${String(prevDateObj.getMonth() + 1).padStart(2, '0')}`;
   const lastMonthData = expenses.filter(exp => exp.created_at.startsWith(prevMonthStr));
 
+  // --- TRATAMENTO DE DADOS PARA O GRÁFICO ---
+  const budgetAsNumber = parseFloat(String(monthlyBudget).replace(',', '.')) || 0;
   const totalSpent = currentMonthData.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
+  const remaining = budgetAsNumber - totalSpent;
 
   return (
     <div className="min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans antialiased flex flex-col">
@@ -217,7 +211,7 @@ export const Home = () => {
       </header>
 
       <main className="max-w-md mx-auto p-5 space-y-6 flex-grow w-full">
-        <section className="bg-white p-8 rounded-[32px] shadow-[0_2px_15px_rgba(0,0,0,0.02)] flex flex-col items-center justify-center animate-fade-in group text-center">
+        <section className="bg-white p-8 rounded-[32px] shadow-[0_2px_15px_rgba(0,0,0,0.02)] flex flex-col items-center justify-center animate-fade-in group text-center border border-gray-50">
           <label className="text-[9px] font-bold uppercase text-blue-500 tracking-[0.2em] mb-2 opacity-60">
             {t('dashboard.budget')}
           </label>
@@ -229,13 +223,13 @@ export const Home = () => {
                 value={monthlyBudget} 
                 onChange={handleBudgetChange}
                 onBlur={() => {
-                  // Opcional: Quando o utilizador sai do campo, formatamos para bonito (ex: 1200.50)
                   if (monthlyBudget) {
-                    const fixed = parseFloat(monthlyBudget.replace(',', '.')).toFixed(2);
+                    const normalized = monthlyBudget.toString().replace(',', '.');
+                    const fixed = parseFloat(normalized).toFixed(2);
                     setMonthlyBudget(fixed.replace('.', ','));
                   }
                 }}
-                className="text-3xl font-bold text-black w-auto max-w-[150px] outline-none bg-transparent border-none p-0 tracking-tighter focus:ring-0 text-center"
+                className="text-3xl font-bold text-black w-auto max-w-[180px] outline-none bg-transparent border-none p-0 tracking-tighter focus:ring-0 text-center"
               />
               <span className="text-xl font-bold text-gray-200 ml-1 select-none">€</span>
             </div>
@@ -255,12 +249,13 @@ export const Home = () => {
           </button>
         </div>
 
+        {/* Passamos valores convertidos para evitar bugs de visualização */}
         <BudgetChart 
           currentMonthExpenses={currentMonthData}
           lastMonthExpenses={lastMonthData}
           totalSpent={totalSpent}
-          remaining={monthlyBudget - totalSpent}
-          budget={monthlyBudget}
+          remaining={remaining}
+          budget={budgetAsNumber}
         />
 
         <div className="space-y-2">
