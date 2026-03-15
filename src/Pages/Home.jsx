@@ -161,8 +161,7 @@ export const Home = () => {
   // --- TRATAMENTO DE DADOS PARA O GRÁFICO ---
   const budgetAsNumber = parseFloat(String(monthlyBudget).replace(',', '.')) || 0;
   const totalSpent = currentMonthData.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
-  const remaining = budgetAsNumber - totalSpent;
-
+  const remaining = parseFloat((budgetAsNumber - totalSpent).toFixed(2));
   return (
     <div className="min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans antialiased flex flex-col">
       

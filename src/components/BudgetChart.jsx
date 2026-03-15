@@ -50,6 +50,11 @@ export default function BudgetChart({ currentMonthExpenses, lastMonthExpenses, t
     };
   });
 
+  // Função auxiliar para formatar valores monetários de forma consistente
+  const formatMoney = (value) => {
+    return parseFloat(value).toFixed(2).replace('.', ',');
+  };
+
   return (
     <div className="space-y-4 animate-fade-in">
       <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-100 relative">
@@ -76,6 +81,7 @@ export default function BudgetChart({ currentMonthExpenses, lastMonthExpenses, t
                 <Tooltip 
                   contentStyle={{ borderRadius: '15px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} 
                   itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
+                  formatter={(value) => [`${formatMoney(value)}€`]}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -89,11 +95,11 @@ export default function BudgetChart({ currentMonthExpenses, lastMonthExpenses, t
             <span className="text-[10px] uppercase font-black text-slate-400 tracking-widest">
               {t('dashboard.total_spent')}
             </span>
-            <span className="text-4xl font-black text-slate-800">
-              {totalSpent.toFixed(0)}€
+            <span className="text-4xl font-black text-slate-800 tracking-tighter">
+              {formatMoney(totalSpent)}€
             </span>
             <span className="text-[10px] font-bold text-blue-600 mt-1 px-3 py-0.5 bg-blue-50 rounded-full">
-              {t('dashboard.budget')}: {budget}€
+              {t('dashboard.budget')}: {formatMoney(budget)}€
             </span>
           </div>
         </div>
@@ -105,8 +111,8 @@ export default function BudgetChart({ currentMonthExpenses, lastMonthExpenses, t
             </p>
             <p className={`text-sm font-bold ${isSaving ? 'text-green-600' : 'text-red-600'}`}>
               {isSaving 
-                ? `${t('dashboard.saved')} ${Math.abs(diffUntilToday).toFixed(0)}€` 
-                : `${t('dashboard.spent')} +${diffUntilToday.toFixed(0)}€`}
+                ? `${t('dashboard.saved')} ${formatMoney(Math.abs(diffUntilToday))}€` 
+                : `${t('dashboard.spent')} +${formatMoney(diffUntilToday)}€`}
             </p>
           </div>
           <span className="text-xl">{isSaving ? '📉' : '📈'}</span>
@@ -117,8 +123,8 @@ export default function BudgetChart({ currentMonthExpenses, lastMonthExpenses, t
             <span>{t('dashboard.budget_progress')}</span>
             <span className={remaining < 0 ? 'text-red-500 font-black' : 'text-blue-600'}>
               {remaining < 0 
-                ? `${t('dashboard.exceeded')} ${Math.abs(remaining).toFixed(0)}€` 
-                : `${remaining.toFixed(0)}€ ${t('dashboard.left')}`}
+                ? `${t('dashboard.exceeded')} ${formatMoney(Math.abs(remaining))}€` 
+                : `${formatMoney(remaining)}€ ${t('dashboard.left')}`}
             </span>
           </div>
           <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -135,7 +141,7 @@ export default function BudgetChart({ currentMonthExpenses, lastMonthExpenses, t
           <div key={s.id} className="bg-white p-4 rounded-2xl border border-slate-50 shadow-sm flex flex-col justify-between min-h-[80px]">
             <p className="text-[9px] uppercase font-black text-slate-400 truncate">{s.name}</p>
             <div className="flex items-center justify-between mt-2">
-              <span className="text-sm font-bold text-slate-700">{s.current.toFixed(0)}€</span>
+              <span className="text-sm font-bold text-slate-700">{formatMoney(s.current)}€</span>
               <span className={`text-[10px] font-black ${s.isHigher ? 'text-red-500' : 'text-green-500'}`}>
                 {s.isHigher ? '↑' : '↓'} {Math.abs(s.diff).toFixed(0)}%
               </span>
