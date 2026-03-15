@@ -27,9 +27,9 @@ export const Home = () => {
   const [session, setSession] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [monthlyBudget, setMonthlyBudget] = useState(""); 
+  const [monthlyBudget, setMonthlyBudget] = useState("");
   
-  const ADMIN_EMAIL = 'your-email@example.com'; 
+  const ADMIN_EMAIL = 'your-email@example.com';
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
@@ -65,22 +65,26 @@ export const Home = () => {
     } finally {
       localStorage.clear();
       sessionStorage.clear();
-      window.location.reload(); 
+      window.location.reload();
     }
   };
 
   async function fetchExpenses() {
-    const { data, error } = await supabase.from('expenses').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (!error) setExpenses(data);
   }
 
   async function fetchMonthlyBudget() {
     if (!session?.user?.id) return;
     const [year, month] = selectedMonth.split('-').map(Number);
-    
+
     const { data, error } = await supabase
       .from('budgets')
       .select('amount')
+      .eq('user_id', session.user.id)
       .eq('month', month)
       .eq('year', year)
       .maybeSingle();
@@ -88,8 +92,8 @@ export const Home = () => {
     if (!error && data) {
       setMonthlyBudget(data.amount.toString().replace('.', ','));
     } else {
-        if (!monthlyBudget) setMonthlyBudget("1000");    
-      }
+      setMonthlyBudget("1000");
+    }
   }
 
   const handleBudgetChange = async (e) => {
@@ -103,7 +107,7 @@ export const Home = () => {
         const [year, month] = selectedMonth.split('-').map(Number);
         const { error } = await supabase
           .from('budgets')
-          .upsert({ 
+          .upsert({
             user_id: session.user.id,
             month: month,
             year: year,
@@ -111,7 +115,6 @@ export const Home = () => {
           }, { onConflict: 'user_id, month, year' });
 
         if (error) console.error("Erro no Supabase:", error.message);
-        setTimeout(() => setIsSavingBudget(false), 500);
       }
     }
   };
@@ -127,12 +130,12 @@ export const Home = () => {
     const dateToSave = isCurrentMonth ? new Date().toISOString() : `${selectedMonth}-01T12:00:00`;
 
     const { data, error } = await supabase.from('expenses').insert([
-      { 
-        amount: newExpense.amount, 
-        category: newExpense.category, 
-        note: newExpense.note, // SALVANDO A NOTA NO BANCO
+      {
+        amount: newExpense.amount,
+        category: newExpense.category,
+        note: newExpense.note,
         user_id: session.user.id,
-        created_at: dateToSave 
+        created_at: dateToSave
       }
     ]).select();
 
@@ -143,7 +146,7 @@ export const Home = () => {
   };
 
   const handleDeleteExpense = async (id) => {
-    const confirmDelete = window.confirm(t('actions.cancel') + "?"); 
+    const confirmDelete = window.confirm(t('actions.cancel') + "?");
     if (!confirmDelete) return;
     const { error } = await supabase.from('expenses').delete().eq('id', id);
     if (!error) setExpenses(prev => prev.filter(exp => exp.id !== id));
@@ -166,45 +169,43 @@ export const Home = () => {
       
       <header className="px-6 pt-12 pb-4">
         <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100">
-                  <span className="text-blue-600 font-bold text-sm">{displayName.charAt(0)}</span>
-              </div>
-              
-              <div>
-                  <h1 className="text-2xl font-extrabold tracking-tight text-black leading-none">
-                    {t('dashboard.welcome')} {displayName}
-                  </h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em]">
-                        {t('dashboard.mtd')}
-                    </p>
-                    {session.user.email === ADMIN_EMAIL && (
-                        <span className="text-[8px] bg-blue-500/10 text-blue-600 px-1.5 py-0.5 rounded-md font-black uppercase tracking-wider">Admin</span>
-                    )}
-                  </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100">
+              <span className="text-blue-600 font-bold text-sm">{displayName.charAt(0)}</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-extrabold tracking-tight text-black leading-none">
+                {t('dashboard.welcome')} {displayName}
+              </h1>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em]">
+                  {t('dashboard.mtd')}
+                </p>
+                {session.user.email === ADMIN_EMAIL && (
+                  <span className="text-[8px] bg-blue-500/10 text-blue-600 px-1.5 py-0.5 rounded-md font-black uppercase tracking-wider">Admin</span>
+                )}
               </div>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={toggleLanguage}
-                className="w-7 h-7 rounded-full overflow-hidden border border-white shadow-sm hover:scale-110 active:scale-95 transition-all"
-              >
-                <img 
-                  src={i18n.language === 'pt' ? "/en.png" : "/pt.png"} 
-                  alt="Language Toggle" 
-                  className="w-full h-full object-cover"
-                />
-              </button>
-
-              <button 
-                onClick={handleLogout} 
-                className="bg-gray-200/50 hover:bg-gray-200 px-3 py-1.5 rounded-full text-[11px] font-bold text-gray-500 transition-all active:scale-95 uppercase tracking-wider"
-              >
-                {t('nav.logout')}
-              </button>
-            </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleLanguage}
+              className="w-7 h-7 rounded-full overflow-hidden border border-white shadow-sm hover:scale-110 active:scale-95 transition-all"
+            >
+              <img
+                src={i18n.language === 'pt' ? "/en.png" : "/pt.png"}
+                alt="Language Toggle"
+                className="w-full h-full object-cover"
+              />
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-gray-200/50 hover:bg-gray-200 px-3 py-1.5 rounded-full text-[11px] font-bold text-gray-500 transition-all active:scale-95 uppercase tracking-wider"
+            >
+              {t('nav.logout')}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -215,10 +216,10 @@ export const Home = () => {
           </label>
           <div className="relative flex flex-col items-center">
             <div className="flex items-baseline justify-center">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 inputMode="decimal"
-                value={monthlyBudget} 
+                value={monthlyBudget}
                 onChange={handleBudgetChange}
                 onBlur={() => {
                   if (monthlyBudget) {
@@ -247,7 +248,7 @@ export const Home = () => {
           </button>
         </div>
 
-        <BudgetChart 
+        <BudgetChart
           currentMonthExpenses={currentMonthData}
           lastMonthExpenses={lastMonthData}
           totalSpent={totalSpent}
@@ -267,7 +268,6 @@ export const Home = () => {
                     <span className="font-bold text-[14px] text-gray-800 tracking-tight leading-none">
                       {t(`categories.${exp.category}`)}
                     </span>
-                    {/* EXIBIÇÃO DA NOTA ABAIXO DA CATEGORIA */}
                     {exp.note && (
                       <span className="text-[11px] text-gray-500 italic mt-1 leading-tight">
                         {exp.note}
@@ -294,8 +294,8 @@ export const Home = () => {
         <Footer />
       </main>
 
-      <button 
-        onClick={() => setShowForm(true)} 
+      <button
+        onClick={() => setShowForm(true)}
         className="fixed bottom-8 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center active:scale-90 transition-all z-50"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
