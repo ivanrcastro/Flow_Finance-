@@ -71,12 +71,19 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
         <div className="relative">
           <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-300 text-xl">€</span>
           <input
-            type="number"
+            type="text"
             step="0.01"
             inputMode="decimal"
             placeholder="0.00"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => {
+              // Substitui vírgulas por pontos internamente para o banco de dados aceitar
+              const val = e.target.value.replace(',', '.');
+              // Só permite números e um único ponto decimal
+              if (/^\d*\.?\d*$/.test(val)) {
+                setAmount(val);
+              }
+            }}
             className="w-full pl-12 pr-6 py-5 bg-slate-50 rounded-2xl text-3xl font-black outline-none border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all text-slate-800"
             autoFocus
           />
