@@ -213,6 +213,7 @@ export const Home = () => {
             <div className="flex items-baseline justify-center">
               <input 
                 type="number" 
+                inputMode="decimal"
                 value={monthlyBudget} 
                 onChange={handleBudgetChange}
                 className="text-3xl font-bold text-black w-auto max-w-[150px] outline-none bg-transparent border-none p-0 tracking-tighter focus:ring-0 text-center"
