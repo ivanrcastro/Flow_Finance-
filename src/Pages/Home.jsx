@@ -98,22 +98,34 @@ export const Home = () => {
   }
 
   const handleBudgetChange = async (e) => {
-    const value = Number(e.target.value);
-    setMonthlyBudget(value);
-    
-    const [year, month] = selectedMonth.split('-').map(Number);
+  // 1. Pegamos no valor tal como o utilizador digitou (com vírgula ou ponto)
+  let rawValue = e.target.value;
+  
+  // 2. Permitimos que o utilizador apague tudo ou escreva (apenas números e uma vírgula/ponto)
+  if (rawValue === "" || /^[0-9]*[.,]?[0-9]*$/.test(rawValue)) {
+    setMonthlyBudget(rawValue); // Atualiza o ecrã com o que ele digitou (ex: "1200,5")
 
-    const { error } = await supabase
-      .from('budgets')
-      .upsert({ 
-        user_id: session.user.id,
-        month: month,
-        year: year,
-        amount: value
-      }, { onConflict: 'user_id, month, year' });
+    // 3. Só tentamos guardar no Supabase se houver números
+    const normalizedValue = rawValue.replace(',', '.');
+    const numericValue = parseFloat(normalizedValue);
 
-    if (error) console.error("Erro ao guardar orçamento:", error.message);
-  };
+    if (!isNaN(numericValue) && session?.user?.id) {
+      const [year, month] = selectedMonth.split('-').map(Number);
+      
+      // Debounce ou Delay seria ideal aqui, mas vamos fazer o upsert direto
+      const { error } = await supabase
+        .from('budgets')
+        .upsert({ 
+          user_id: session.user.id,
+          month: month,
+          year: year,
+          amount: numericValue
+        }, { onConflict: 'user_id, month, year' });
+
+      if (error) console.error("Erro no Supabase:", error.message);
+    }
+  }
+};
 
   const handleMonthChange = (offset) => {
     const [year, month] = selectedMonth.split('-').map(Number);
@@ -216,6 +228,13 @@ export const Home = () => {
                 inputMode="decimal"
                 value={monthlyBudget} 
                 onChange={handleBudgetChange}
+                onBlur={() => {
+                  // Opcional: Quando o utilizador sai do campo, formatamos para bonito (ex: 1200.50)
+                  if (monthlyBudget) {
+                    const fixed = parseFloat(monthlyBudget.replace(',', '.')).toFixed(2);
+                    setMonthlyBudget(fixed.replace('.', ','));
+                  }
+                }}
                 className="text-3xl font-bold text-black w-auto max-w-[150px] outline-none bg-transparent border-none p-0 tracking-tighter focus:ring-0 text-center"
               />
               <span className="text-xl font-bold text-gray-200 ml-1 select-none">€</span>
