@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useTranslation } from 'react-i18next';
 
@@ -36,6 +36,14 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
 
+  // Foco automático para disparar a sugestão de biometria/teclado
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      document.getElementById('username')?.focus();
+    }, 600); 
+    return () => clearTimeout(timer);
+  }, [isSignUp]);
+
   const handleAuth = async (e) => {
     e.preventDefault();
     if (!username || !password) return;
@@ -45,7 +53,6 @@ export const Login = () => {
 
     try {
       if (isSignUp) {
-        // 1. Criar a conta
         const { error: signUpError } = await supabase.auth.signUp({ 
           email, 
           password,
@@ -54,12 +61,11 @@ export const Login = () => {
         
         if (signUpError) throw signUpError;
 
-        // 2. Login Automático (Crucial para o browser pedir para guardar password)
+        // Login imediato para o browser associar a password à conta com sucesso
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) throw signInError;
 
       } else {
-        // Login normal
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw new Error("Invalid credentials");
       }
@@ -83,7 +89,6 @@ export const Login = () => {
 
       <div className="relative w-full max-w-[400px] mx-4 backdrop-blur-2xl bg-white/70 border border-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[32px] p-10">
         
-        {/* LOGO */}
         <div className="flex justify-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -103,20 +108,24 @@ export const Login = () => {
 
         <form onSubmit={handleAuth} className="space-y-4">
           <input
+            id="username"
             type="text"
             name="username"
             autoComplete="username" 
             placeholder={t('auth.placeholderUser')}
+            required
             value={username}
             onChange={(e)=>setUsername(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl bg-gray-50/50 border border-gray-100 text-black placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           />
 
           <input
+            id="password"
             type="password"
             name="password"
             autoComplete={isSignUp ? "new-password" : "current-password"}
             placeholder={t('auth.placeholderPass')}
+            required
             value={password}
             onChange={(e)=>setPassword(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl bg-gray-50/50 border border-gray-100 text-black placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
