@@ -31,7 +31,8 @@
     "placeholderPass": "Password",
     "continue": "Continue",
     "switchSignUp": "New to Flow? Create an account",
-    "switchSignIn": "Already have an account? Sign in"
+    "switchSignIn": "Already have an account? Sign in",
+    "placeholderNote": "Note (optional)"
   },
   "actions": {
     "save": "Save Transaction",

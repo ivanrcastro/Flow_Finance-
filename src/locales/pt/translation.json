@@ -31,7 +31,8 @@
     "placeholderPass": "Palavra-passe",
     "continue": "Continuar",
     "switchSignUp": "Novo no Flow? Criar conta",
-    "switchSignIn": "Já tem conta? Iniciar sessão"
+    "switchSignIn": "Já tem conta? Iniciar sessão",
+    "placeholderNote": "Nota (opcional)"
   },
   "actions": {
     "save": "Guardar Transação",

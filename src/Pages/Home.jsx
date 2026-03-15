@@ -88,8 +88,8 @@ export const Home = () => {
     if (!error && data) {
       setMonthlyBudget(data.amount.toString().replace('.', ','));
     } else {
-      setMonthlyBudget("1000");
-    }
+        if (!monthlyBudget) setMonthlyBudget("1000");    
+      }
   }
 
   const handleBudgetChange = async (e) => {
@@ -111,6 +111,7 @@ export const Home = () => {
           }, { onConflict: 'user_id, month, year' });
 
         if (error) console.error("Erro no Supabase:", error.message);
+        setTimeout(() => setIsSavingBudget(false), 500);
       }
     }
   };
