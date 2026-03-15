@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useTranslation } from 'react-i18next';
 
-// Componente Interno para o Seletor de Línguas
 const LanguageSelector = () => {
   const { i18n } = useTranslation();
   const changeLanguage = (lng) => i18n.changeLanguage(lng);
@@ -36,13 +35,8 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
 
-  // Foco automático para disparar a sugestão de biometria/teclado
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      document.getElementById('username')?.focus();
-    }, 600); 
-    return () => clearTimeout(timer);
-  }, [isSignUp]);
+  // Removido o auto-focus via JS — bloqueia o autofill/FaceID no iOS/Safari
+  // O autofill só funciona quando o utilizador toca no campo diretamente
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -61,7 +55,6 @@ export const Login = () => {
         
         if (signUpError) throw signUpError;
 
-        // Login imediato para o browser associar a password à conta com sucesso
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) throw signInError;
 
@@ -83,7 +76,6 @@ export const Login = () => {
         <LanguageSelector />
       </div>
 
-      {/* BACKGROUND GLOWS */}
       <div className="absolute w-[600px] h-[600px] bg-blue-200/50 blur-[120px] rounded-full -top-40 -left-40 animate-pulse"></div>
       <div className="absolute w-[500px] h-[500px] bg-indigo-100/60 blur-[120px] rounded-full bottom-0 right-0"></div>
 
@@ -111,11 +103,11 @@ export const Login = () => {
             id="username"
             type="text"
             name="username"
-            autoComplete="username" 
+            autoComplete="username webauthn"
             placeholder={t('auth.placeholderUser')}
             required
             value={username}
-            onChange={(e)=>setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl bg-gray-50/50 border border-gray-100 text-black placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           />
 
@@ -123,15 +115,16 @@ export const Login = () => {
             id="password"
             type="password"
             name="password"
-            autoComplete={isSignUp ? "new-password" : "current-password"}
+            autoComplete={isSignUp ? "new-password" : "current-password webauthn"}
             placeholder={t('auth.placeholderPass')}
             required
             value={password}
-            onChange={(e)=>setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl bg-gray-50/50 border border-gray-100 text-black placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           />
 
           <button
+            type="submit"
             disabled={loading}
             className="w-full mt-2 py-4 rounded-2xl bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 active:scale-[0.98] transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50"
           >
@@ -142,7 +135,7 @@ export const Login = () => {
         <div className="text-center mt-8">
           <button
             type="button"
-            onClick={()=>setIsSignUp(!isSignUp)}
+            onClick={() => setIsSignUp(!isSignUp)}
             className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
           >
             {isSignUp ? t('auth.switchSignIn') : t('auth.switchSignUp')}
