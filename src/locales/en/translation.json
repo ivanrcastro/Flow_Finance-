@@ -11,7 +11,7 @@
     "footer": "Flow Finance • 2026 • Designed for Clarity"
   },
   "dashboard": {
-    "welcome": "Welcome back,",
+    "welcome": "",
     "balance": "Monthly Balance",
     "budget": "Budget Limit",
     "spent": "Total Spent",
