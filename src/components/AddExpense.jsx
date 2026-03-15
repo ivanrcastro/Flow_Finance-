@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-// Mantemos o ID fixo para o Banco de Dados, mas o Label será traduzido
 const CATEGORIES = [
   { id: 'Bills', icon: '📄' },
   { id: 'Subscriptions', icon: '🔄' },
@@ -21,13 +20,11 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
   const { t } = useTranslation();
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
+  const [note, setNote] = useState(''); // Estado para a nota
 
   // BLOQUEAR SCROLL DA HOME
   useEffect(() => {
-    // Quando monta: remove o scroll do body
     document.body.style.overflow = 'hidden';
-    
-    // Quando desmonta (fecha): devolve o scroll
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -40,14 +37,18 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
       return alert(t('actions.fillAll') || "Please fill all fields!");
     }
 
-    const newExpense = {
-      amount: parseFloat(amount),
-      category: category,
-    };
+    // Convertemos para número antes de enviar, garantindo que o ponto decimal é usado
+    const numericAmount = parseFloat(amount.replace(',', '.'));
 
-    onAddExpense(newExpense);
+    onAddExpense({
+      amount: numericAmount, 
+      category, 
+      note: note.trim() // Remove espaços desnecessários
+    });
+
     setAmount('');
     setCategory('');
+    setNote('');
   };
 
   return (
@@ -66,22 +67,20 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
         </h3>
       </div>
       
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Input de Valor */}
         <div className="relative">
           <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-300 text-xl">€</span>
           <input
             type="text"
-            step="0.01"
             inputMode="decimal"
             placeholder="0.00"
             value={amount}
             onChange={(e) => {
-              // Substitui vírgulas por pontos internamente para o banco de dados aceitar
               const val = e.target.value.replace(',', '.');
-              // Só permite números e um único ponto decimal
               if (/^\d*\.?\d*$/.test(val)) {
-                setAmount(val);
+                // Mantemos o valor original (com vírgula se o user preferir) no ecrã
+                setAmount(e.target.value); 
               }
             }}
             className="w-full pl-12 pr-6 py-5 bg-slate-50 rounded-2xl text-3xl font-black outline-none border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all text-slate-800"
@@ -89,8 +88,19 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
           />
         </div>
 
+        {/* Campo de Nota (Opcional) - Integrado aqui */}
+        <div className="relative">
+           <input
+            type="text"
+            placeholder={t('auth.placeholderNote') || "Nota (ex: Jantar com amigos)"}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="w-full px-5 py-3 bg-slate-50 rounded-xl text-sm font-medium outline-none border border-transparent focus:border-blue-200 focus:bg-white transition-all text-slate-600"
+          />
+        </div>
+
         {/* Grid de Categorias */}
-        <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+        <div className="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.id}
@@ -104,7 +114,6 @@ export const AddExpense = ({ onAddExpense, onClose }) => {
             >
               <span className="text-xl mb-1">{cat.icon}</span>
               <span className="text-[8px] font-black uppercase tracking-tighter truncate w-full text-center">
-                {/* Tradução dinâmica baseada no ID da categoria */}
                 {t(`categories.${cat.id}`)}
               </span>
             </button>

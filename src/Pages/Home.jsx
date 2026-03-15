@@ -27,7 +27,7 @@ export const Home = () => {
   const [session, setSession] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [monthlyBudget, setMonthlyBudget] = useState(""); // Mantido como string para suporte a vírgula
+  const [monthlyBudget, setMonthlyBudget] = useState(""); 
   
   const ADMIN_EMAIL = 'your-email@example.com'; 
 
@@ -94,11 +94,8 @@ export const Home = () => {
 
   const handleBudgetChange = async (e) => {
     let rawValue = e.target.value;
-    
-    // Aceita apenas números e um separador (ponto ou vírgula)
     if (rawValue === "" || /^[0-9]*[.,]?[0-9]*$/.test(rawValue)) {
       setMonthlyBudget(rawValue);
-
       const normalizedValue = rawValue.replace(',', '.');
       const numericValue = parseFloat(normalizedValue);
 
@@ -132,6 +129,7 @@ export const Home = () => {
       { 
         amount: newExpense.amount, 
         category: newExpense.category, 
+        note: newExpense.note, // SALVANDO A NOTA NO BANCO
         user_id: session.user.id,
         created_at: dateToSave 
       }
@@ -158,10 +156,10 @@ export const Home = () => {
   const prevMonthStr = `${prevDateObj.getFullYear()}-${String(prevDateObj.getMonth() + 1).padStart(2, '0')}`;
   const lastMonthData = expenses.filter(exp => exp.created_at.startsWith(prevMonthStr));
 
-  // --- TRATAMENTO DE DADOS PARA O GRÁFICO ---
   const budgetAsNumber = parseFloat(String(monthlyBudget).replace(',', '.')) || 0;
   const totalSpent = currentMonthData.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
   const remaining = parseFloat((budgetAsNumber - totalSpent).toFixed(2));
+
   return (
     <div className="min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans antialiased flex flex-col">
       
@@ -248,7 +246,6 @@ export const Home = () => {
           </button>
         </div>
 
-        {/* Passamos valores convertidos para evitar bugs de visualização */}
         <BudgetChart 
           currentMonthExpenses={currentMonthData}
           lastMonthExpenses={lastMonthData}
@@ -266,13 +263,23 @@ export const Home = () => {
               currentMonthData.map((exp, idx) => (
                 <div key={exp.id} className={`p-4 flex justify-between items-center active:bg-gray-50 transition-colors ${idx !== 0 ? 'border-t border-gray-50' : ''}`}>
                   <div className="flex flex-col">
-                    <span className="font-bold text-[14px] text-gray-800 tracking-tight">{t(`categories.${exp.category}`)}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
+                    <span className="font-bold text-[14px] text-gray-800 tracking-tight leading-none">
+                      {t(`categories.${exp.category}`)}
+                    </span>
+                    {/* EXIBIÇÃO DA NOTA ABAIXO DA CATEGORIA */}
+                    {exp.note && (
+                      <span className="text-[11px] text-gray-500 italic mt-1 leading-tight">
+                        {exp.note}
+                      </span>
+                    )}
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter mt-1.5">
                       {new Date(exp.created_at).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="font-bold text-[15px] text-black tracking-tight">-{parseFloat(exp.amount).toFixed(2)}€</span>
+                    <span className="font-bold text-[15px] text-black tracking-tight">
+                      -{parseFloat(exp.amount).toFixed(2).replace('.', ',')}€
+                    </span>
                     <button onClick={() => handleDeleteExpense(exp.id)} className="text-gray-200 hover:text-red-500 active:opacity-20 transition-all">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                     </button>
