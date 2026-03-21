@@ -44,124 +44,109 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
     }
 
     const numericAmount = parseFloat(amount.replace(',', '.'));
-    
-    onAddExpense({ 
-      amount: numericAmount, 
-      category, 
-      note: note.trim(), 
-      isRecurring: editingExpense ? false : isRecurring 
-    });
-
+    onAddExpense({ amount: numericAmount, category, note: note.trim(), isRecurring: editingExpense ? false : isRecurring });
     if (!editingExpense) {
       setAmount(''); setCategory(''); setNote(''); setIsRecurring(false);
     }
   };
 
   return (
-    <div className="bg-white p-8 rounded-t-[40px] shadow-2xl border-t border-slate-100 relative animate-slide-up">
-      <button 
-        type="button"
-        onClick={onClose} 
-        className="absolute top-4 right-6 text-slate-300 hover:text-slate-600 text-2xl font-bold p-2 transition-colors"
-      >
-        ×
-      </button>
-
-      <div className="mb-6">
-        <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 text-center">
+    <div className="bg-white h-full w-full flex flex-col p-8 overflow-y-auto animate-slide-up">
+      
+      {/* Header Minimalista */}
+      <div className="flex justify-between items-center mb-12">
+        <button type="button" onClick={onClose} className="text-slate-400 text-xs font-black uppercase tracking-widest hover:text-slate-600 transition-colors">
+          {t('actions.cancel')}
+        </button>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">
           {editingExpense ? t('actions.editExpense') : t('nav.addExpense')}
         </h3>
-        
-        {error && (
-          <div className="mt-4 p-3 bg-red-50 rounded-xl border border-red-100 animate-pulse">
-            <p className="text-[11px] text-red-500 font-bold text-center uppercase tracking-wider">
-              ⚠️ {error}
-            </p>
-          </div>
-        )}
+        <div className="w-10"></div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
-          <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-300 text-xl">€</span>
-          <input
-            type="text"
-            inputMode="decimal"
-            placeholder="0,00"
-            value={amount}
-            onChange={(e) => {
-              setError('');
-              const val = e.target.value;
-              if (/^[0-9]*[.,]?[0-9]*$/.test(val)) setAmount(val);
-            }}
-            className={`w-full pl-12 pr-6 py-5 bg-slate-50 rounded-2xl text-3xl font-black outline-none border-2 transition-all text-slate-800 ${error && !amount ? 'border-red-200 bg-red-50/30' : 'border-transparent focus:border-blue-500 focus:bg-white'}`}
-            autoFocus
-          />
+      <form onSubmit={handleSubmit} className="flex flex-col flex-grow space-y-10">
+        
+        {/* Input de Valor com Linha Subtil */}
+        <div className="text-center group">
+          <div className="relative inline-block w-full max-w-[240px]">
+            <span className={`absolute left-0 top-1/2 -translate-y-1/2 font-black text-2xl transition-colors ${error && !amount ? 'text-red-300' : 'text-slate-300 group-focus-within:text-blue-500'}`}>€</span>
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="0,00"
+              value={amount}
+              onChange={(e) => {
+                setError('');
+                const val = e.target.value;
+                if (/^[0-9]*[.,]?[0-9]*$/.test(val)) setAmount(val);
+              }}
+              className="text-6xl font-black outline-none bg-transparent text-slate-800 placeholder-slate-100 w-full text-center tracking-tighter border-b-2 border-slate-50 focus:border-blue-500 transition-all pb-2"
+              autoFocus
+            />
+          </div>
+          {error && <p className="text-[10px] text-red-500 font-bold uppercase tracking-[0.2em] mt-4 animate-pulse">{error}</p>}
         </div>
 
+        {/* Input de Nota com Linha Subtil */}
         <div className="relative">
           <input
             type="text"
             placeholder={t('expenses.placeholderNote')}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="w-full px-5 py-3 bg-slate-50 rounded-xl text-sm font-medium outline-none border border-transparent focus:border-blue-200 focus:bg-white transition-all text-slate-600"
+            className="w-full px-1 py-3 bg-transparent text-sm font-bold outline-none border-b border-slate-100 focus:border-blue-400 transition-all text-slate-600 placeholder-slate-300"
           />
         </div>
 
+        {/* Toggle Recorrente (Mais discreto) */}
         {!editingExpense && (
           <button
             type="button"
             onClick={() => setIsRecurring(!isRecurring)}
-            className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl border-2 transition-all duration-300 ${
-              isRecurring ? 'border-blue-500 bg-blue-50' : 'border-slate-100 bg-slate-50'
-            }`}
+            className="flex items-center justify-between py-2 group"
           >
             <div className="flex items-center gap-3">
-              <span className="text-lg">🔁</span>
+              <span className={`text-lg transition-opacity ${isRecurring ? 'opacity-100' : 'opacity-40'}`}>🔁</span>
               <div className="text-left">
-                <p className={`text-xs font-black uppercase tracking-wider ${isRecurring ? 'text-blue-600' : 'text-slate-400'}`}>
+                <span className={`text-[10px] font-black uppercase tracking-widest transition-colors ${isRecurring ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-400'}`}>
                   {t('expenses.recurringTitle')}
-                </p>
-                <p className="text-[10px] text-slate-400 font-medium">{t('expenses.recurringSubtitle')}</p>
+                </span>
               </div>
             </div>
-            <div className={`w-10 h-6 rounded-full transition-all duration-300 flex items-center px-1 ${isRecurring ? 'bg-blue-500' : 'bg-slate-200'}`}>
-              <div className={`w-4 h-4 bg-white rounded-full shadow transition-all duration-300 ${isRecurring ? 'translate-x-4' : 'translate-x-0'}`} />
+            <div className={`w-8 h-4 rounded-full transition-all flex items-center px-0.5 ${isRecurring ? 'bg-blue-500' : 'bg-slate-100'}`}>
+              <div className={`w-3 h-3 bg-white rounded-full shadow-sm transition-all ${isRecurring ? 'translate-x-4' : 'translate-x-0'}`} />
             </div>
           </button>
         )}
 
-        <div className={`grid grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar p-1 rounded-2xl transition-all ${error && !category ? 'bg-red-50/50 ring-1 ring-red-100' : ''}`}>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => {
-                setCategory(cat.id);
-                setError('');
-              }}
-              className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all duration-300 ${
-                category === cat.id
-                  ? 'border-blue-500 bg-blue-50 text-blue-600 scale-95 shadow-inner font-bold'
-                  : 'border-slate-50 bg-slate-50 text-slate-400 hover:border-slate-200'
-              }`}
-            >
-              <span className="text-xl mb-1">{cat.icon}</span>
-              <span className="text-[8px] font-black uppercase tracking-tighter truncate w-full text-center">
-                {t(`categories.${cat.id}`)}
-              </span>
-            </button>
-          ))}
+        {/* Grelha de Categorias (4 colunas para evitar scroll) */}
+        <div className="flex-grow pt-4">
+           <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em] mb-6 ml-1">{t('dashboard.categories')}</p>
+           <div className="grid grid-cols-4 gap-4">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => { setCategory(cat.id); setError(''); }}
+                className={`flex flex-col items-center justify-center py-4 rounded-2xl transition-all duration-300 ${
+                  category === cat.id
+                    ? 'bg-blue-50 text-blue-600 scale-95 shadow-inner ring-2 ring-blue-100'
+                    : 'bg-white text-slate-300 hover:text-slate-500 border border-slate-50'
+                }`}
+              >
+                <span className="text-2xl mb-2">{cat.icon}</span>
+                <span className={`text-[7px] font-black uppercase tracking-tighter text-center px-1 leading-tight ${category === cat.id ? 'text-blue-600' : 'text-slate-400'}`}>
+                  {t(`categories.${cat.id}`)}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
+        {/* Botão de Guardar Estilo Premium */}
         <button
           type="submit"
-          className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all ${
-            error 
-            ? 'bg-slate-400 text-white cursor-not-allowed' 
-            : 'bg-blue-600 text-white shadow-blue-500/20 hover:bg-blue-700'
-          }`}
+          className="w-full bg-slate-900 text-white py-6 rounded-2xl font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all mt-auto"
         >
           {editingExpense ? t('actions.update') : t('actions.save')}
         </button>
