@@ -26,106 +26,127 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Previne scroll no fundo mas permite dentro do modal se necessário
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = 'unset'; };
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!amount || amount === '0' || amount === '0,00') return setError(t('errors.invalidAmount'));
-    if (!category) return setError(t('errors.selectCategory'));
+    setError('');
+
+    if (!amount || amount === '0' || amount === '0,00') {
+      setError(t('errors.invalidAmount'));
+      return;
+    }
+    if (!category) {
+      setError(t('errors.selectCategory'));
+      return;
+    }
 
     const numericAmount = parseFloat(amount.replace(',', '.'));
-    onAddExpense({ amount: numericAmount, category, note: note.trim(), isRecurring: editingExpense ? false : isRecurring });
+    onAddExpense({ 
+      amount: numericAmount, 
+      category, 
+      note: note.trim(), 
+      isRecurring: editingExpense ? false : isRecurring 
+    });
   };
 
   return (
-    // Mudança para min-h-screen e flex-col para garantir que cabe em ecrãs pequenos
-    <div className="bg-white min-h-[100dvh] w-full flex flex-col p-5 overflow-y-auto animate-slide-up">
-      
-      {/* Header mais compacto */}
-      <div className="flex justify-between items-center mb-6 pt-2">
-        <button type="button" onClick={onClose} className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
-          {t('actions.cancel')}
-        </button>
-        <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300">
+    <div className="bg-white p-6 rounded-t-[40px] shadow-2xl border-t border-slate-100 relative animate-slide-up max-h-[90vh] overflow-y-auto">
+      {/* Botão de fechar original */}
+      <button 
+        type="button"
+        onClick={onClose} 
+        className="absolute top-4 right-6 text-slate-300 hover:text-slate-600 text-2xl font-bold p-2 transition-colors"
+      >
+        ×
+      </button>
+
+      <div className="mb-6">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 text-center">
           {editingExpense ? t('actions.editExpense') : t('nav.addExpense')}
         </h3>
-        <div className="w-8"></div>
+        {error && (
+          <p className="text-[9px] text-red-500 font-bold text-center uppercase tracking-wider mt-2 animate-pulse">
+            {error}
+          </p>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col flex-grow justify-between gap-4">
-        
-        {/* Secção de Valor (Reduzida para caber com teclado) */}
-        <div className="text-center py-2">
-          <div className="relative inline-block w-full max-w-[200px]">
-            <span className="absolute left-0 top-1/2 -translate-y-1/2 font-black text-xl text-slate-300">€</span>
-            <input
-              type="text"
-              inputMode="decimal"
-              placeholder="0,00"
-              value={amount}
-              onChange={(e) => { setError(''); setAmount(e.target.value.replace('.', ',')); }}
-              className="text-5xl font-black outline-none bg-transparent text-slate-800 w-full text-center tracking-tighter border-b border-slate-100 focus:border-blue-500 transition-all pb-1"
-              autoFocus
-            />
-          </div>
-          {error && <p className="text-[9px] text-red-500 font-bold uppercase mt-2 tracking-tighter">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Input de Valor com a linha subtil que preferes */}
+        <div className="relative group">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-300 text-xl">€</span>
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder="0,00"
+            value={amount}
+            onChange={(e) => {
+              setError('');
+              const val = e.target.value;
+              if (/^[0-9]*[.,]?[0-9]*$/.test(val)) setAmount(val);
+            }}
+            className="w-full pl-10 pr-4 py-4 bg-transparent text-4xl font-black outline-none border-b-2 border-slate-50 focus:border-blue-500 transition-all text-slate-800 text-center"
+            autoFocus
+          />
         </div>
 
-        {/* Nota Compacta */}
+        {/* Nota com linha subtil */}
         <input
           type="text"
           placeholder={t('expenses.placeholderNote')}
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full px-1 py-2 bg-transparent text-xs font-bold outline-none border-b border-slate-50 focus:border-blue-300 transition-all text-slate-600"
+          className="w-full px-2 py-3 bg-transparent text-sm font-semibold outline-none border-b border-slate-50 focus:border-blue-200 transition-all text-slate-600"
         />
 
-        {/* Categorias - Mais pequenas e sem margens gigantes */}
-        <div className="flex-grow flex flex-col justify-center">
-          <div className="grid grid-cols-4 gap-2">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => { setCategory(cat.id); setError(''); }}
-                className={`flex flex-col items-center justify-center py-2.5 rounded-xl transition-all ${
-                  category === cat.id
-                    ? 'bg-blue-600 text-white scale-95 shadow-lg shadow-blue-200'
-                    : 'bg-slate-50 text-slate-400 border border-transparent'
-                }`}
-              >
-                <span className="text-lg mb-0.5">{cat.icon}</span>
-                <span className="text-[6px] font-black uppercase tracking-tighter text-center leading-none px-0.5">
-                  {t(`categories.${cat.id}`)}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Toggle Recorrente Minimalista */}
+        {/* Toggle Recorrente compacto */}
         {!editingExpense && (
           <button
             type="button"
             onClick={() => setIsRecurring(!isRecurring)}
-            className="flex items-center justify-between py-1 px-1"
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition-all ${
+              isRecurring ? 'border-blue-100 bg-blue-50/30' : 'border-slate-50 bg-slate-50/50'
+            }`}
           >
-            <span className={`text-[9px] font-black uppercase tracking-widest ${isRecurring ? 'text-blue-600' : 'text-slate-300'}`}>
-              {t('expenses.recurringTitle')}
-            </span>
-            <div className={`w-7 h-3.5 rounded-full flex items-center px-0.5 transition-all ${isRecurring ? 'bg-blue-500' : 'bg-slate-200'}`}>
-              <div className={`w-2.5 h-2.5 bg-white rounded-full shadow-sm transition-all ${isRecurring ? 'translate-x-3.5' : 'translate-x-0'}`} />
+            <div className="flex items-center gap-3">
+              <span className="text-sm">🔁</span>
+              <span className={`text-[10px] font-black uppercase tracking-wider ${isRecurring ? 'text-blue-600' : 'text-slate-400'}`}>
+                {t('expenses.recurringTitle')}
+              </span>
+            </div>
+            <div className={`w-8 h-4 rounded-full transition-all flex items-center px-0.5 ${isRecurring ? 'bg-blue-500' : 'bg-slate-200'}`}>
+              <div className={`w-3 h-3 bg-white rounded-full shadow transition-all ${isRecurring ? 'translate-x-4' : 'translate-x-0'}`} />
             </div>
           </button>
         )}
 
-        {/* Botão Final - Sempre visível */}
+        {/* Grelha de Categorias - 4 Colunas (Mais pequenas) */}
+        <div className="grid grid-cols-4 gap-2 pt-2">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => { setCategory(cat.id); setError(''); }}
+              className={`flex flex-col items-center justify-center py-3 rounded-xl border-2 transition-all ${
+                category === cat.id
+                  ? 'border-blue-500 bg-blue-50 text-blue-600 scale-95 shadow-inner'
+                  : 'border-transparent bg-slate-50 text-slate-400'
+              }`}
+            >
+              <span className="text-lg mb-1">{cat.icon}</span>
+              <span className="text-[7px] font-black uppercase tracking-tighter text-center leading-none px-0.5">
+                {t(`categories.${cat.id}`)}
+              </span>
+            </button>
+          ))}
+        </div>
+
         <button
           type="submit"
-          className="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-[0.2em] text-xs active:scale-95 transition-all mt-2 shadow-lg"
+          className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20 active:scale-95 transition-all text-xs"
         >
           {editingExpense ? t('actions.update') : t('actions.save')}
         </button>
