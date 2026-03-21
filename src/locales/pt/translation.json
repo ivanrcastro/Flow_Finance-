@@ -37,7 +37,9 @@
   "actions": {
     "save": "Guardar Transação",
     "cancel": "Cancelar",
-    "loading": "A processar..."
+    "loading": "A processar...", 
+    "update": "Atualizar",
+    "editExpense": "Editar Despesa"
   },
   "categories": {
     "Bills": "Contas",
@@ -52,5 +54,14 @@
     "Business": "Negócios",
     "Gifts": "Prendas",
     "Other": "Outros"
+  }, 
+  "expenses": {
+    "placeholderNote": "Nota (ex: Jantar com amigos)",
+    "recurringTitle": "Despesa Recorrente",
+    "recurringSubtitle": "Repete automaticamente todos os meses"
+  },
+  "errors": {
+    "invalidAmount": "Introduza um valor válido",
+    "selectCategory": "Escolha uma categoria"
   }
 }

@@ -3,47 +3,49 @@
     "dashboard": "Dashboard",
     "analytics": "Analytics",
     "addExpense": "Add Expense",
-    "logout": "Sign Out"
+    "logout": "Logout"
   },
   "app": {
     "name": "Flow Finance",
-    "tagline": "Manage your finances beautifully",
-    "footer": "Flow Finance • 2026 • Designed for Clarity"
+    "tagline": "Manage your finances with elegance",
+    "footer": "Flow Finance • Designed for Clarity"
   },
   "dashboard": {
-    "welcome": "",
+    "welcome": "Welcome",
     "balance": "Monthly Balance",
-    "budget": "Budget Limit",
+    "budget": "Limit",
     "spent": "Total Spent",
-    "mtd": "Month to Date",
+    "mtd": "Monthly Total Expenses",
     "categories": "Spending by Category",
     "total_spent": "Total Spent",
-    "vs_last_month": "vs Last Month (MTD)",
-    "saved": "Saved",
+    "vs_last_month": "vs Last Month",
+    "saved": "You saved",
     "budget_progress": "Budget Progress",
     "exceeded": "Exceeded by",
-    "left": "left"
+    "left": "remaining"
   },
   "auth": {
-    "signIn": "Welcome back",
+    "signIn": "Welcome Back",
     "signUp": "Create your Flow account",
     "placeholderUser": "Username",
     "placeholderPass": "Password",
     "continue": "Continue",
-    "switchSignUp": "New to Flow? Create an account",
+    "switchSignUp": "New to Flow? Create account",
     "switchSignIn": "Already have an account? Sign in",
     "placeholderNote": "Note (optional)"
   },
   "actions": {
     "save": "Save Transaction",
     "cancel": "Cancel",
-    "loading": "Processing..."
+    "loading": "Processing...",
+    "update": "Update",
+    "editExpense": "Edit Expense"
   },
   "categories": {
     "Bills": "Bills",
     "Subscriptions": "Subscriptions",
-    "Entertainment": "Entertainment",
-    "Food & Drink": "Food & Drink",
+    "Entertainment": "Leisure",
+    "Food & Drink": "Dining",
     "Groceries": "Groceries",
     "Health & Wellbeing": "Health",
     "Shopping": "Shopping",
@@ -52,5 +54,14 @@
     "Business": "Business",
     "Gifts": "Gifts",
     "Other": "Other"
+  },
+  "expenses": {
+    "placeholderNote": "Note (e.g. Dinner with friends)",
+    "recurringTitle": "Recurring Expense",
+    "recurringSubtitle": "Automatically repeats every month"
+  },
+  "errors": {
+    "invalidAmount": "Enter a valid amount",
+    "selectCategory": "Choose a category"
   }
 }

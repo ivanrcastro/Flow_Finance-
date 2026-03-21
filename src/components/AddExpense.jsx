@@ -19,11 +19,11 @@ const CATEGORIES = [
 export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
   const { t } = useTranslation();
   
-  // Inicializa o estado com os dados da despesa se estivermos em modo de edição
   const [amount, setAmount] = useState(editingExpense ? editingExpense.amount.toString().replace('.', ',') : '');
   const [category, setCategory] = useState(editingExpense ? editingExpense.category : '');
   const [note, setNote] = useState(editingExpense ? editingExpense.note : '');
   const [isRecurring, setIsRecurring] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -32,16 +32,24 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!amount || !category) return alert(t('actions.fillAll') || "Please fill all fields!");
+    setError('');
+
+    if (!amount || amount === '0' || amount === '0,00') {
+      setError(t('errors.invalidAmount'));
+      return;
+    }
+    if (!category) {
+      setError(t('errors.selectCategory'));
+      return;
+    }
 
     const numericAmount = parseFloat(amount.replace(',', '.'));
     
-    // Enviamos os dados de volta para a Home
     onAddExpense({ 
       amount: numericAmount, 
       category, 
       note: note.trim(), 
-      isRecurring: editingExpense ? false : isRecurring // Não permite tornar recorrente na edição simples
+      isRecurring: editingExpense ? false : isRecurring 
     });
 
     if (!editingExpense) {
@@ -61,8 +69,16 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
 
       <div className="mb-6">
         <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 text-center">
-          {editingExpense ? t('actions.edit') || "Editar Despesa" : t('nav.addExpense')}
+          {editingExpense ? t('actions.editExpense') : t('nav.addExpense')}
         </h3>
+        
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 rounded-xl border border-red-100 animate-pulse">
+            <p className="text-[11px] text-red-500 font-bold text-center uppercase tracking-wider">
+              ⚠️ {error}
+            </p>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -74,10 +90,11 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
             placeholder="0,00"
             value={amount}
             onChange={(e) => {
+              setError('');
               const val = e.target.value;
               if (/^[0-9]*[.,]?[0-9]*$/.test(val)) setAmount(val);
             }}
-            className="w-full pl-12 pr-6 py-5 bg-slate-50 rounded-2xl text-3xl font-black outline-none border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all text-slate-800"
+            className={`w-full pl-12 pr-6 py-5 bg-slate-50 rounded-2xl text-3xl font-black outline-none border-2 transition-all text-slate-800 ${error && !amount ? 'border-red-200 bg-red-50/30' : 'border-transparent focus:border-blue-500 focus:bg-white'}`}
             autoFocus
           />
         </div>
@@ -85,14 +102,13 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
         <div className="relative">
           <input
             type="text"
-            placeholder={t('auth.placeholderNote') || "Nota (ex: Jantar com amigos)"}
+            placeholder={t('expenses.placeholderNote')}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             className="w-full px-5 py-3 bg-slate-50 rounded-xl text-sm font-medium outline-none border border-transparent focus:border-blue-200 focus:bg-white transition-all text-slate-600"
           />
         </div>
 
-        {/* Só mostra a opção de Recorrente se NÃO estivermos a editar uma despesa já existente */}
         {!editingExpense && (
           <button
             type="button"
@@ -105,9 +121,9 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
               <span className="text-lg">🔁</span>
               <div className="text-left">
                 <p className={`text-xs font-black uppercase tracking-wider ${isRecurring ? 'text-blue-600' : 'text-slate-400'}`}>
-                  Despesa Recorrente
+                  {t('expenses.recurringTitle')}
                 </p>
-                <p className="text-[10px] text-slate-400 font-medium">Repete automaticamente todos os meses</p>
+                <p className="text-[10px] text-slate-400 font-medium">{t('expenses.recurringSubtitle')}</p>
               </div>
             </div>
             <div className={`w-10 h-6 rounded-full transition-all duration-300 flex items-center px-1 ${isRecurring ? 'bg-blue-500' : 'bg-slate-200'}`}>
@@ -116,12 +132,15 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
           </button>
         )}
 
-        <div className="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
+        <div className={`grid grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar p-1 rounded-2xl transition-all ${error && !category ? 'bg-red-50/50 ring-1 ring-red-100' : ''}`}>
           {CATEGORIES.map((cat) => (
             <button
               key={cat.id}
               type="button"
-              onClick={() => setCategory(cat.id)}
+              onClick={() => {
+                setCategory(cat.id);
+                setError('');
+              }}
               className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all duration-300 ${
                 category === cat.id
                   ? 'border-blue-500 bg-blue-50 text-blue-600 scale-95 shadow-inner font-bold'
@@ -138,9 +157,13 @@ export const AddExpense = ({ onAddExpense, onClose, editingExpense }) => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20 active:scale-95 transition-all hover:bg-blue-700"
+          className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all ${
+            error 
+            ? 'bg-slate-400 text-white cursor-not-allowed' 
+            : 'bg-blue-600 text-white shadow-blue-500/20 hover:bg-blue-700'
+          }`}
         >
-          {editingExpense ? t('actions.update') || "Atualizar" : t('actions.save')}
+          {editingExpense ? t('actions.update') : t('actions.save')}
         </button>
       </form>
     </div>
